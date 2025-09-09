@@ -1,3 +1,5 @@
+![MAAK-TreasuryDashboard](image.png)
+
 # US Treasury Dashboard
 
 A real-time dashboard for monitoring US Treasury on-the-run issues with Bloomberg terminal-inspired styling.
