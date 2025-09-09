@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { MarketGridComponent } from './components/market-grid/market-grid.component';
 import { YieldCurveComponent } from './components/yield-curve/yield-curve.component';
 import { StatusBarComponent } from './components/status-bar/status-bar.component';
+import { TradeBlotterComponent } from './components/trade-blotter/trade-blotter.component';
 import { TreasuryService } from './services/treasury.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, MarketGridComponent, YieldCurveComponent, StatusBarComponent],
+  imports: [CommonModule, MarketGridComponent, YieldCurveComponent, StatusBarComponent, TradeBlotterComponent],
   template: `
     <div class="dashboard">
       <header class="header">
@@ -29,6 +30,9 @@ import { TreasuryService } from './services/treasury.service';
           </div>
           <div class="chart-section">
             <app-yield-curve></app-yield-curve>
+          </div>
+          <div class="blotter-section">
+            <app-trade-blotter></app-trade-blotter>
           </div>
         </div>
       </main>
@@ -102,6 +106,7 @@ import { TreasuryService } from './services/treasury.service';
       height: 100%;
       display: grid;
       grid-template-columns: 2fr 1fr;
+      grid-template-rows: 1fr 300px;
       gap: 4px;
     }
     
@@ -113,10 +118,19 @@ import { TreasuryService } from './services/treasury.service';
       overflow: hidden;
     }
     
+    .blotter-section {
+      grid-column: 1 / -1;
+      overflow: hidden;
+    }
+    
     @media (max-width: 1200px) {
       .grid-container {
         grid-template-columns: 1fr;
-        grid-template-rows: 1fr 300px;
+        grid-template-rows: 1fr 300px 250px;
+      }
+      
+      .blotter-section {
+        grid-column: 1;
       }
     }
   `]

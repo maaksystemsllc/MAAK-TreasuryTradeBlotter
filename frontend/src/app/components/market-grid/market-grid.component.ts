@@ -96,15 +96,27 @@ export class MarketGridComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Load initial data
     this.subscription.add(
-      this.treasuryService.getAllBonds().subscribe(bonds => {
-        this.bonds = bonds;
+      this.treasuryService.getAllBonds().subscribe({
+        next: (bonds) => {
+          console.log('Market Grid - Received bonds:', bonds);
+          this.bonds = bonds;
+        },
+        error: (error) => {
+          console.error('Market Grid - Error loading bonds:', error);
+        }
       })
     );
 
     // Subscribe to real-time updates
     this.subscription.add(
-      this.treasuryService.marketData$.subscribe(bonds => {
-        this.updateBonds(bonds);
+      this.treasuryService.marketData$.subscribe({
+        next: (bonds) => {
+          console.log('Market Grid - WebSocket update:', bonds);
+          this.updateBonds(bonds);
+        },
+        error: (error) => {
+          console.error('Market Grid - WebSocket error:', error);
+        }
       })
     );
   }
@@ -114,7 +126,7 @@ export class MarketGridComponent implements OnInit, OnDestroy {
   }
 
   private updateBonds(newBonds: TreasuryBond[]): void {
-    newBonds.forEach(newBond => {
+    newBonds.forEach((newBond: TreasuryBond) => {
       const existingIndex = this.bonds.findIndex(b => b.cusip === newBond.cusip);
       if (existingIndex >= 0) {
         this.bonds[existingIndex] = newBond;

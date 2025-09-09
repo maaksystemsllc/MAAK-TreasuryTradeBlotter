@@ -19,7 +19,7 @@ import { Subscription } from 'rxjs';
           <div *ngFor="let point of yieldCurveData" class="data-point">
             <span class="maturity">{{ point.maturity }}</span>
             <span class="yield" [class]="getYieldClass(point.change)">
-              {{ formatYield(point.yield) }}
+              {{ formatYield(point.yieldValue) }}
             </span>
             <span class="change" [class]="getYieldClass(point.change)">
               {{ formatChange(point.change) }}
@@ -104,7 +104,7 @@ export class YieldCurveComponent implements OnInit, OnDestroy {
   private updateYieldCurve(bonds: TreasuryBond[]): void {
     this.yieldCurveData = bonds.map(bond => ({
       maturity: bond.maturity,
-      yield: bond.yield,
+      yieldValue: bond.yield,
       change: bond.yieldChange,
       maturityOrder: this.getMaturityOrder(bond.maturity)
     })).sort((a, b) => a.maturityOrder - b.maturityOrder);
@@ -130,8 +130,8 @@ export class YieldCurveComponent implements OnInit, OnDestroy {
     const height = canvas.height;
 
     // Clear canvas
-    this.ctx.fillStyle = '#1a1a1a';
-    this.ctx.fillRect(0, 0, width, height);
+    this.ctx!.fillStyle = '#1a1a1a';
+    this.ctx!.fillRect(0, 0, width, height);
 
     // Set up chart dimensions
     const padding = 40;
@@ -139,78 +139,78 @@ export class YieldCurveComponent implements OnInit, OnDestroy {
     const chartHeight = height - 2 * padding;
 
     // Find min/max yields for scaling
-    const yields = this.yieldCurveData.map(d => d.yield);
+    const yields = this.yieldCurveData.map(d => d.yieldValue);
     const minYield = Math.min(...yields) - 0.1;
     const maxYield = Math.max(...yields) + 0.1;
 
     // Draw grid lines
-    this.ctx.strokeStyle = '#333333';
-    this.ctx.lineWidth = 1;
+    this.ctx!.strokeStyle = '#333333';
+    this.ctx!.lineWidth = 1;
     
     // Horizontal grid lines
     for (let i = 0; i <= 5; i++) {
       const y = padding + (i / 5) * chartHeight;
-      this.ctx.beginPath();
-      this.ctx.moveTo(padding, y);
-      this.ctx.lineTo(width - padding, y);
-      this.ctx.stroke();
+      this.ctx!.beginPath();
+      this.ctx!.moveTo(padding, y);
+      this.ctx!.lineTo(width - padding, y);
+      this.ctx!.stroke();
     }
 
     // Vertical grid lines
     for (let i = 0; i < this.yieldCurveData.length; i++) {
       const x = padding + (i / (this.yieldCurveData.length - 1)) * chartWidth;
-      this.ctx.beginPath();
-      this.ctx.moveTo(x, padding);
-      this.ctx.lineTo(x, height - padding);
-      this.ctx.stroke();
+      this.ctx!.beginPath();
+      this.ctx!.moveTo(x, padding);
+      this.ctx!.lineTo(x, height - padding);
+      this.ctx!.stroke();
     }
 
     // Draw yield curve
-    this.ctx.strokeStyle = '#00ff00';
-    this.ctx.lineWidth = 2;
-    this.ctx.beginPath();
+    this.ctx!.strokeStyle = '#00ff00';
+    this.ctx!.lineWidth = 2;
+    this.ctx!.beginPath();
 
     this.yieldCurveData.forEach((point, index) => {
       const x = padding + (index / (this.yieldCurveData.length - 1)) * chartWidth;
-      const y = height - padding - ((point.yield - minYield) / (maxYield - minYield)) * chartHeight;
+      const y = height - padding - ((point.yieldValue - minYield) / (maxYield - minYield)) * chartHeight;
 
       if (index === 0) {
-        this.ctx.moveTo(x, y);
+        this.ctx!.moveTo(x, y);
       } else {
-        this.ctx.lineTo(x, y);
+        this.ctx!.lineTo(x, y);
       }
 
       // Draw data points
-      this.ctx.fillStyle = point.change >= 0 ? '#ff0000' : '#00ff00';
-      this.ctx.beginPath();
-      this.ctx.arc(x, y, 4, 0, 2 * Math.PI);
-      this.ctx.fill();
+      this.ctx!.fillStyle = point.change >= 0 ? '#ff0000' : '#00ff00';
+      this.ctx!.beginPath();
+      this.ctx!.arc(x, y, 4, 0, 2 * Math.PI);
+      this.ctx!.fill();
     });
 
-    this.ctx.stroke();
+    this.ctx!.stroke();
 
     // Draw labels
-    this.ctx.fillStyle = '#ffffff';
-    this.ctx.font = '10px Roboto Mono';
-    this.ctx.textAlign = 'center';
+    this.ctx!.fillStyle = '#ffffff';
+    this.ctx!.font = '10px Roboto Mono';
+    this.ctx!.textAlign = 'center';
 
     // X-axis labels (maturities)
     this.yieldCurveData.forEach((point, index) => {
       const x = padding + (index / (this.yieldCurveData.length - 1)) * chartWidth;
-      this.ctx.fillText(point.maturity, x, height - 10);
+      this.ctx!.fillText(point.maturity, x, height - 10);
     });
 
     // Y-axis labels (yields)
-    this.ctx.textAlign = 'right';
+    this.ctx!.textAlign = 'right';
     for (let i = 0; i <= 5; i++) {
       const y = padding + (i / 5) * chartHeight;
       const yieldValue = maxYield - (i / 5) * (maxYield - minYield);
-      this.ctx.fillText(yieldValue.toFixed(2) + '%', padding - 10, y + 3);
+      this.ctx!.fillText(yieldValue.toFixed(2) + '%', padding - 10, y + 3);
     }
   }
 
-  formatYield(yield: number): string {
-    return `${yield.toFixed(3)}%`;
+  formatYield(yieldValue: number): string {
+    return `${yieldValue.toFixed(3)}%`;
   }
 
   formatChange(change: number): string {
