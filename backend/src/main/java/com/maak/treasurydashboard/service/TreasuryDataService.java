@@ -26,6 +26,7 @@ public class TreasuryDataService {
     public void initializeData() {
         if (repository.count() == 0) {
             // Initialize with on-the-run treasury bonds
+            // Constructor: cusip, maturity, yield, price, coupon, bidPrice, askPrice
             repository.save(new TreasuryBond("912828YK5", "2Y", 
                 new BigDecimal("4.875"), new BigDecimal("99.8125"), 
                 new BigDecimal("4.875"), new BigDecimal("99.8000"), new BigDecimal("99.8250")));
@@ -41,6 +42,8 @@ public class TreasuryDataService {
             repository.save(new TreasuryBond("912810TM0", "30Y", 
                 new BigDecimal("4.625"), new BigDecimal("95.1250"), 
                 new BigDecimal("4.625"), new BigDecimal("95.1125"), new BigDecimal("95.1375")));
+            
+            System.out.println("Initialized " + repository.count() + " Treasury bonds");
         }
     }
     
