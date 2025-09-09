@@ -1,0 +1,156 @@
+/* Bloomberg Terminal Inspired Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto Mono', monospace;
+  background-color: #000000;
+  color: #00ff00;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+/* Bloomberg Color Palette */
+:root {
+  --bg-primary: #000000;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #2d2d2d;
+  --text-primary: #00ff00;
+  --text-secondary: #ffff00;
+  --text-accent: #00ffff;
+  --text-warning: #ff8c00;
+  --text-danger: #ff0000;
+  --border-color: #333333;
+  --grid-border: #404040;
+  --header-bg: #0066cc;
+  --positive: #00ff00;
+  --negative: #ff0000;
+  --neutral: #ffff00;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Common Classes */
+.positive {
+  color: var(--positive) !important;
+}
+
+.negative {
+  color: var(--negative) !important;
+}
+
+.neutral {
+  color: var(--neutral) !important;
+}
+
+.blink {
+  animation: blink 0.5s ease-in-out;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Grid Styles */
+.data-grid {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 11px;
+  
+  th, td {
+    border: 1px solid var(--grid-border);
+    padding: 4px 8px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: var(--header-bg);
+    color: white;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  tr:nth-child(even) {
+    background-color: var(--bg-secondary);
+  }
+  
+  tr:hover {
+    background-color: var(--bg-tertiary);
+  }
+}
+
+/* Button Styles */
+.btn {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 4px 12px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: var(--border-color);
+  }
+  
+  &:active {
+    background-color: var(--bg-secondary);
+  }
+}
+
+/* Status Bar */
+.status-bar {
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  padding: 4px 8px;
+  font-size: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Panel Styles */
+.panel {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  margin: 2px;
+}
+
+.panel-header {
+  background-color: var(--header-bg);
+  color: white;
+  padding: 4px 8px;
+  font-weight: bold;
+  font-size: 11px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.panel-content {
+  padding: 8px;
+  height: calc(100% - 25px);
+  overflow: auto;
+}
