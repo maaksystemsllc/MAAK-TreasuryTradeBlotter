@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TreasuryService } from '../../services/treasury.service';
 import { TreasuryBond } from '../../models/treasury-bond.model';
@@ -24,6 +24,9 @@ import { Subscription } from 'rxjs';
             <span class="change" [class]="getYieldClass(point.change)">
               {{ formatChange(point.change) }}
             </span>
+          </div>
+          <div *ngIf="yieldCurveData.length === 0" class="no-data">
+            No yield curve data available
           </div>
         </div>
       </div>
@@ -70,7 +73,7 @@ import { Subscription } from 'rxjs';
     }
   `]
 })
-export class YieldCurveComponent implements OnInit, OnDestroy {
+export class YieldCurveComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('yieldChart', { static: true }) chartCanvas!: ElementRef<HTMLCanvasElement>;
   
   yieldCurveData: any[] = [];
@@ -80,19 +83,34 @@ export class YieldCurveComponent implements OnInit, OnDestroy {
   constructor(private treasuryService: TreasuryService) {}
 
   ngOnInit(): void {
+    // Subscribe to real-time updates
+    this.subscription.add(
+      this.treasuryService.marketData$.subscribe({
+        next: (bonds) => {
+          console.log('Yield Curve - WebSocket update:', bonds);
+          this.updateYieldCurve(bonds);
+        },
+        error: (error) => {
+          console.error('Yield Curve - WebSocket error:', error);
+        }
+      })
+    );
+  }
+
+  ngAfterViewInit(): void {
+    // Initialize canvas after view is ready
     this.ctx = this.chartCanvas.nativeElement.getContext('2d');
     
     // Load initial data
     this.subscription.add(
-      this.treasuryService.getAllBonds().subscribe(bonds => {
-        this.updateYieldCurve(bonds);
-      })
-    );
-
-    // Subscribe to real-time updates
-    this.subscription.add(
-      this.treasuryService.marketData$.subscribe(bonds => {
-        this.updateYieldCurve(bonds);
+      this.treasuryService.getAllBonds().subscribe({
+        next: (bonds) => {
+          console.log('Yield Curve - Received initial bonds:', bonds);
+          this.updateYieldCurve(bonds);
+        },
+        error: (error) => {
+          console.error('Yield Curve - Error loading initial bonds:', error);
+        }
       })
     );
   }
@@ -102,6 +120,7 @@ export class YieldCurveComponent implements OnInit, OnDestroy {
   }
 
   private updateYieldCurve(bonds: TreasuryBond[]): void {
+    console.log('Yield Curve - Updating with bonds:', bonds);
     this.yieldCurveData = bonds.map(bond => ({
       maturity: bond.maturity,
       yieldValue: bond.yield,
@@ -109,6 +128,7 @@ export class YieldCurveComponent implements OnInit, OnDestroy {
       maturityOrder: this.getMaturityOrder(bond.maturity)
     })).sort((a, b) => a.maturityOrder - b.maturityOrder);
 
+    console.log('Yield Curve - Processed data:', this.yieldCurveData);
     this.drawChart();
   }
 
@@ -126,6 +146,11 @@ export class YieldCurveComponent implements OnInit, OnDestroy {
     if (!this.ctx || this.yieldCurveData.length === 0) return;
 
     const canvas = this.chartCanvas.nativeElement;
+    // Set canvas size to match container
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width || 400;
+    canvas.height = rect.height || 200;
+    
     const width = canvas.width;
     const height = canvas.height;
 

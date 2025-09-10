@@ -43,12 +43,33 @@ export class TreasuryService {
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
       onConnect: (frame: any) => {
-        console.log('Connected: ' + frame);
+        console.log('WebSocket Connected: ' + frame);
+        console.log('Subscribing to /topic/market-data');
         
         this.stompClient?.subscribe('/topic/market-data', (message: any) => {
-          const bonds: TreasuryBond[] = JSON.parse(message.body);
-          this.marketDataSubject.next(bonds);
+          console.log('WebSocket: Received market data message:', message);
+          try {
+            const bonds: TreasuryBond[] = JSON.parse(message.body);
+            console.log('WebSocket: Parsed bonds data:', bonds);
+            this.marketDataSubject.next(bonds);
+          } catch (error) {
+            console.error('WebSocket: Error parsing message:', error);
+          }
         });
+
+        // Also subscribe to yield curve updates (same data, different topic)
+        this.stompClient?.subscribe('/topic/yield-curve', (message: any) => {
+          console.log('WebSocket: Received yield curve message:', message);
+          try {
+            const bonds: TreasuryBond[] = JSON.parse(message.body);
+            console.log('WebSocket: Parsed yield curve data:', bonds);
+            this.marketDataSubject.next(bonds);
+          } catch (error) {
+            console.error('WebSocket: Error parsing yield curve message:', error);
+          }
+        });
+        
+        console.log('WebSocket subscription established');
       },
       onStompError: (error: any) => {
         console.error('WebSocket connection error:', error);

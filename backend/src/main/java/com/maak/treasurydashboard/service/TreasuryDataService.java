@@ -49,7 +49,9 @@ public class TreasuryDataService {
     
     @Scheduled(fixedRate = 2000) // Update every 2 seconds
     public void updateMarketData() {
+        System.out.println("Scheduled task: Starting market data update");
         List<TreasuryBond> bonds = repository.findAll();
+        System.out.println("Found " + bonds.size() + " bonds to update");
         
         for (TreasuryBond bond : bonds) {
             // Simulate realistic market movements
@@ -90,7 +92,10 @@ public class TreasuryDataService {
         }
         
         // Send updates via WebSocket
+        System.out.println("Calling WebSocket service to send updates");
         webSocketService.sendMarketUpdate(bonds);
+        webSocketService.sendYieldCurveUpdate(bonds);
+        System.out.println("Market data update cycle completed");
     }
     
     public List<TreasuryBond> getAllBonds() {

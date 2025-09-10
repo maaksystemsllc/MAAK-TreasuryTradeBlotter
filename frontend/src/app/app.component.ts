@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MarketGridComponent } from './components/market-grid/market-grid.component';
 import { YieldCurveComponent } from './components/yield-curve/yield-curve.component';
 import { StatusBarComponent } from './components/status-bar/status-bar.component';
 import { TradeBlotterComponent } from './components/trade-blotter/trade-blotter.component';
+import { TradeBookingComponent } from './components/trade-booking/trade-booking.component';
 import { TreasuryService } from './services/treasury.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, MarketGridComponent, YieldCurveComponent, StatusBarComponent, TradeBlotterComponent],
+  imports: [CommonModule, MarketGridComponent, YieldCurveComponent, StatusBarComponent, TradeBlotterComponent, TradeBookingComponent],
   template: `
     <div class="dashboard">
       <header class="header">
@@ -30,6 +31,9 @@ import { TreasuryService } from './services/treasury.service';
           </div>
           <div class="chart-section">
             <app-yield-curve></app-yield-curve>
+          </div>
+          <div class="booking-section">
+            <app-trade-booking></app-trade-booking>
           </div>
           <div class="blotter-section">
             <app-trade-blotter></app-trade-blotter>
@@ -106,15 +110,20 @@ import { TreasuryService } from './services/treasury.service';
       height: 100%;
       display: grid;
       grid-template-columns: 2fr 1fr;
-      grid-template-rows: 1fr 300px;
+      grid-template-rows: 1fr 350px 300px;
       gap: 4px;
     }
     
     .market-section {
+      grid-column: 1 / -1;
       overflow: hidden;
     }
     
     .chart-section {
+      overflow: hidden;
+    }
+    
+    .booking-section {
       overflow: hidden;
     }
     
@@ -126,7 +135,7 @@ import { TreasuryService } from './services/treasury.service';
     @media (max-width: 1200px) {
       .grid-container {
         grid-template-columns: 1fr;
-        grid-template-rows: 1fr 300px 250px;
+        grid-template-rows: 1fr 350px 300px 250px;
       }
       
       .blotter-section {
@@ -135,20 +144,27 @@ import { TreasuryService } from './services/treasury.service';
     }
   `]
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   currentTime: string = '';
+  private timeInterval: any;
 
   constructor(private treasuryService: TreasuryService) {}
 
   ngOnInit(): void {
     this.updateTime();
-    setInterval(() => this.updateTime(), 1000);
+    this.timeInterval = setInterval(() => this.updateTime(), 1000);
     
     // Initialize data on startup
     this.treasuryService.initializeData().subscribe({
       next: (response) => console.log('Data initialized:', response),
       error: (error) => console.error('Failed to initialize data:', error)
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
+    }
   }
 
   private updateTime(): void {
